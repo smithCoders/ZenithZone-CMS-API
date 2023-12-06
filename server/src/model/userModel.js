@@ -41,7 +41,7 @@ const userSchema=Schema({
     },
     passwordConfirm:{
         type:String,
-        required:[true,"Please confirm your password"],
+        required:[false,"Please confirm your password"],
         validate:{
             // this only works on CREATE and SAVE!!!
         validator:function(el){
@@ -82,7 +82,13 @@ default:Date.now
         default:true,
         select:false,
 
-    }
+    },
+    isVerified:{
+        type:Boolean,
+        default:false,
+        select:false,
+    },
+    otp:String,
 },{
     timeStamps:true
 }
@@ -139,11 +145,11 @@ userSchema.methods.comparePassword=async function(enteredPassword){
     return await bcrypt.compare(enteredPassword,this.password);
 };
 
-// generate password reset token
+// generate password resetToken
 userSchema.methods.getResetPasswordToken=function(){
     // generate token
     const resetToken=crypto.randomBytes(32).toString("hex")
-    // hash and set to resetPasswordToken
+    // hash the token (encrypt it).
     this.resetPasswordToken=crypto.createHash("sha256").update(resetToken).digest("hex");
     // set token expire time(30 min)
     this.resetPasswordExpire=Date.now()+30*60*1000;

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            padding: 0;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background-color: #003366;
+            color: #ffffff;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .content {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Welcome to ZenithZone</h1>
+        </div>
+        <div class="content">
+            <p>Dear <%= user.firstName %>,</p>
+            <p>Thank you for joining ZenithZone!</p>
+            <p>We're excited to have you as part of our community where knowledge meets opportunity.</p>
+            <p>Key features of ZenithZone:</p>
+            <ul>
+                <li>Explore a wide range of content.</li>
+                <li>Connect with like-minded individuals.</li>
+                <li>Stay updated with the latest news and updates.</li>
+            </ul>
+            <p>Feel free to explore and engage with our platform. If you have any questions, our support team is here to help.</p>
+            <p>Best regards,</p>
+            <p>The ZenithZone Team</p>
+        </div>
+        <div class="footer">
+            <p>For support, contact us at <%= supportEmail %><p>
+        </div>
+    </div>
+</body>
+</html>

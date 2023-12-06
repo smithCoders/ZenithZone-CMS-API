@@ -1,52 +1,71 @@
 <!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Email Template</title>
+<html>
+  <head>
     <style>
-        /* Add your custom styles here */
-        body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
+      /* Add professional CSS styling here */
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f7f7f7;
+        padding: 0;
+        margin: 0;
+      }
 
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #ffffff;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+      }
 
-        h1 {
-            color: #333333;
-        }
+      .header {
+        background-color: #003366;
+        color: #ffffff;
+        text-align: center;
+        padding: 20px;
+      }
 
-        p {
-            color: #555555;
-        }
+      .content {
+        background-color: #ffffff;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
 
-        .otp {
-            font-size: 24px;
-            font-weight: bold;
-            color: #3498db;
-        }
+      .footer {
+        text-align: center;
+        margin-top: 20px;
+        color: #777;
+      }
     </style>
-</head>
-
-<body>
+  </head>
+  <body>
     <div class="container">
-        <h1>Hello <%= username %>,</h1>
-        <p>Your OTP for verification is:</p>
-        <p class="otp"><%= otp %></p>
-        <p>If you didn't request this, you can ignore this email.</p>
-        <p>Best regards,<br>Your Company</p>
+      <div class="header">
+        <h1>Welcome to ZenithZone CMS</h1>
+      </div>
+      <div class="content">
+        <p>Dear <%= user.firstName %>,</p>
+        <p>
+          Thank you for registering with ZenithZone CMS, where content management meets innovation.
+        </p>
+        <p>
+          To complete your registration, please use the following OTP (One-Time Password):
+        </p>
+        <p><strong><%= user.otp %></strong></p>
+        <p>
+          If you didn't register on ZenithZone CMS, please disregard this email.
+        </p>
+        <p>
+          If you have any questions or need assistance, please contact our
+          support team at <%= supportEmail %>.
+        </p>
+        <p>
+          Thank you for choosing ZenithZone CMS. We're excited to have you on board.
+        </p>
+      </div>
+      <div class="footer">
+        <p>Best regards,</p>
+        <p>The ZenithZone CMS Team</p>
+      </div>
     </div>
-</body>
-
+  </body>
 </html>
