@@ -88,29 +88,14 @@ default:Date.now
         default:false,
         select:false,
     },
-    otp:String,
+    otp:{type:String},
+    otpExpire:{type:Date, select:false}
+
 },{
     timeStamps:true
 }
 );
-// crate joi validation for user
-// const userJoiValidation=joi.object({
-//     firstName:joi.string().required(),
-//     lastName:joi.string().required(),
-//     email:joi.string().email().required(),
-//     password:joi.string().required()
-// }
-// );
 
-// validate data before  save user
-// userSchema.pre('save', async function (next) {
-//   try {
-//     const value = await userJoiValidation.validateAsync(this.toObject());
-//     next();
-//   } catch (error) {
-//     next(error);
-//   }
-// });
 // pre-save middleware to generate userName
 userSchema.pre("save",function(next){
     // generate username only if it doesn't  exist
@@ -121,7 +106,8 @@ userSchema.pre("save",function(next){
 
     }
     next();
-})
+}
+)
 // logging middleware  when user  signup.
 userSchema.pre("save", function(next){
     // check if the document created is New.
@@ -141,9 +127,14 @@ userSchema.pre("save",async function(next){
 }
 );
 // compare user password
-userSchema.methods.comparePassword=async function(enteredPassword){
-    return await bcrypt.compare(enteredPassword,this.password);
+userSchema.methods.comparePassword = async function (enteredPassword) {
+    return await bcrypt.compare(enteredPassword, this.password);
 };
+// only showing active:true user.
+userSchema.pre(/^find/,function(next){
+this.find({isActive:false});
+next()
+})
 
 // generate password resetToken
 userSchema.methods.getResetPasswordToken=function(){

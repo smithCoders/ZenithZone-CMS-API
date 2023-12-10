@@ -5,7 +5,8 @@ const factory=require("./factoryHandler");
  exports.updateMe=catchAsync(async(req,res,next)=>{
         // 1. create error if user post password data
         if(req.body.password || req.body.passwordConfirm){
-            return next(new AppError("this route is not for password update",400));
+            // return next(new AppError("this route is not for password update",400));
+            res.status(400).json({status:"failed",message:"this route is not for password update"});
         }
         // 2. update user document
         const updatedContent=await Content.findByIdAndUpdate(req.params.id,req.body,{
