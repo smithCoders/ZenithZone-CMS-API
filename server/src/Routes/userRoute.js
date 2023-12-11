@@ -6,7 +6,9 @@ const router=express.Router();
 router.route("/signup").post(authController.signUp);
 router.route("/verify").post(authController.activateAccount);
 router.route("/login").post(authController.login);
-router.route("/logout").post(authController.isAuthorized,authController.logout)
+router.route("/logout").post(authController.isAuthorized,authController.logout);
+
+router.use(authController.checkVerification);
 router.route("/forgotPassword").post(authController.forgotPassword);
 router.route("/resetPassword/:token").patch(authController.resetPassword);
 router.route("/updatePassword").
@@ -17,7 +19,8 @@ patch(authController.checkTokenBlacklist,
     router.route("/user/update-password").
     patch(authController.isAuthorized,
         userController.updateMe);
-        router.route("/user/delete-me").delete(authController.isAuthorized, userController.deleteMe)
+        router.route("/user/delete-me").delete(authController.isAuthorized, userController.deleteMe);
+        // router.route("/user/reactivate-account").patch(authController.isAuthorized, userController.reactivateAccount);
 
 // ADMIN------ONLY.
 router.route("/user").

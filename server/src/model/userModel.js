@@ -102,9 +102,9 @@ userSchema.pre("save",function(next){
     if(!this.userName){
        const firstNameLetter=this.firstName[0].toLowerCase();
        const   fatherName=this.lastName.toLowerCase();
-       this.userName=`${firstNameLetter}${fatherName}`
+       this.userName=`${firstNameLetter}${fatherName}` }
 
-    }
+    
     next();
 }
 )
@@ -128,13 +128,30 @@ userSchema.pre("save",async function(next){
 );
 // compare user password
 userSchema.methods.comparePassword = async function (enteredPassword) {
-    return await bcrypt.compare(enteredPassword, this.password);
+    try {
+        return await bcrypt.compare(enteredPassword, this.password);
+    } catch (error) {
+        // Handle the error.
+        console.error("Password comparison error:", error);
+        return false; // Return false to indicate a failure
+    }
 };
-// only showing active:true user.
-userSchema.pre(/^find/,function(next){
-this.find({isActive:false});
-next()
-})
+// ensuring that the isVerified field is included in the results.
+userSchema.pre(/^find/, function (next) {
+    this.select('+isVerified');
+    next();
+});
+
+
+// Apply the pre middleware only to find queries for public user information
+// userSchema.pre(/^find/, function (next) {
+//     // Check if the query has a condition for user activation
+//     if (this.getQuery().isActive === undefined) {
+//         this.find({ isActive: true });
+//     }
+//     next();
+// });
+
 
 // generate password resetToken
 userSchema.methods.getResetPasswordToken=function(){

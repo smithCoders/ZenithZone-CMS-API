@@ -8,41 +8,21 @@ const sendEmail=require("../utils/sendEmail")
 const path=require("path");
 const ejs=require("ejs");
 const  BlacklistToken=require("../model/blacklisted_tokens");
+const {createSendToken}=require("../utils/sendToken")
 
-
-
-const signToken=(id)=>{
-    return jwt.sign({id},process.env.JWT_SECRET,{
-        expiresIn:process.env.JWT_EXPIRES_IN
-    })
-}
-const createSendToken=(user,statusCode,res)=>{
-    const token=signToken(user._id);
-    const cookieOptions={
-        expires:new Date(Date.now()+process.env.JWT_COOKIE_EXPIRES_IN*24*60*60*1000),
-        httpOnly:true
-    }
-    if(process.env.NODE_ENV==="production") cookieOptions.secure=true;
-    res.cookie("jwt",token,cookieOptions);
-    user.password=undefined;
-    res.status(statusCode).json({
-        status:"success",
-        token,
-        data:{
-            user
-        }
-    })
-   
-
-
-};
-// Middleware for handling token expiration.
+// Middleware to extract token from Authorization header
 const getTokenFromHeader = (req) => {
-    if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
-        return req.headers.authorization.split(" ")[1];
+    const authorizationHeader = req.headers.authorization;
+
+
+    if (authorizationHeader && authorizationHeader.startsWith('Bearer')) {
+        // Format: Bearer <token>
+        return authorizationHeader.split(' ')[1];
     }
+
     return null;
-}
+};
+
 // Middleware to check if the token is blacklisted
 exports.checkTokenBlacklist = catchAsync(async (req, res, next) => {
   const token = req.token;
@@ -158,27 +138,47 @@ exports.activateAccount = catchAsync(async(req, res, next) => {
 
 
 // login
+
 exports.login = catchAsync(async (req, res, next) => {
     const { emailOrUsername, password } = req.body;
+
     // Check if emailOrUsername and password are provided
-if (!emailOrUsername || !password) {
-    // return next(new AppError("please provide email or password", 400));
-    res.status(400).json({status:"failed", 
-    message:"please provide us your login credentials"})
-}
+    if (!emailOrUsername || !password) {
+        return res.status(400).json({ status: "failed", message: "Please provide email or username and password" });
+    }
 
     // Check if the user exists (using email or username)
     const user = await User.findOne({
-        // $or: is mongo operator that accept  email or password to query.
         $or: [{ email: emailOrUsername }, { userName: emailOrUsername }],
     }).select("+password");
 
     // Check if the user exists and the password is correct
-    if (!user || !(await user.comparePassword(password))) {
-        return next(new AppError("Incorrect email/username or password", 401));
+    if (!user) {
+        return res.status(401).json({ status: "failed", message: "Incorrect email/username or password" });
     }
-    createSendToken(user, 200, res);
+     // Check if the account is not active
+    if (user.isActive===false) {
+        // Activate the account.
+        user.isActive = true;
+        await user.save();
+// Log in the user and generate the token automatically
+        createSendToken(user, 200, res);
+        return; // Exit the function after creating and sending the token
+    }
+
+    // Check if the user has deleted themselves
+    if (user.isActive === false) {
+        return res.status(401).json({ status: "failed", message: "Account not activated. Please log in again." });
+    }
+    if (!(await user.comparePassword(password))) {
+        return res.status(401).json({ status: "failed", message: "Incorrect password" });
+    }
+
+    // Successful login
+    createSendToken(user,200,res);
 });
+
+
 exports.logout=catchAsync(async(req,res,next)=>{
     const  token=req.token;
     // Add the token to the blacklisted_tokens collection
@@ -322,3 +322,13 @@ await user.save();
 // 4. log user automatically.
 createSendToken(user,200,res);
 });
+// middleware to check if user is verified
+exports.checkVerification=catchAsync(async(req,res,next)=>{
+    const user=await User.findById(req?.user?.id);
+    console.log(user);
+    if(user.isVerified===false){
+        return res.status(400).json({status:"failed",message:"please activate your account to access this route"})
+    }
+    next()
+}
+)
